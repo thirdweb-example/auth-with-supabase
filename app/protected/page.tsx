@@ -1,8 +1,7 @@
-import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
+import { ConnectBtn } from "@/components/ConnectBtn";
+import { Tutorial } from "@/components/Tutorial";
 import { createClient } from "@/utils/supabase/server";
-import FetchDataSteps from "@/components/tutorial/FetchDataSteps";
-import Header from "@/components/Header";
 import { redirect } from "next/navigation";
 
 export default async function ProtectedPage() {
@@ -16,6 +15,10 @@ export default async function ProtectedPage() {
     return redirect("/login");
   }
 
+  let printedMetadata = user.user_metadata;
+  if (!printedMetadata.wallet_address)
+    printedMetadata.wallet_address = "N/A - Need to connect thirdweb";
+
   return (
     <div className="flex-1 w-full flex flex-col gap-20 items-center">
       <div className="w-full">
@@ -25,33 +28,20 @@ export default async function ProtectedPage() {
         </div>
         <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
           <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
-            <DeployButton />
             <AuthButton />
           </div>
         </nav>
+        <div className="mt-10 pl-10">
+          <ConnectBtn />
+        </div>{" "}
+        <Tutorial />
+        <div className="mt-10 pl-10 border">
+          <div>User metadata:</div>
+          <pre className="max-w-[90vw] max-h-[600px] overflow-auto">
+            {JSON.stringify(printedMetadata, null, 2)}
+          </pre>
+        </div>
       </div>
-
-      <div className="animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-4xl px-3">
-        <Header />
-        <main className="flex-1 flex flex-col gap-6">
-          <h2 className="font-bold text-4xl mb-4">Next steps</h2>
-          <FetchDataSteps />
-        </main>
-      </div>
-
-      <footer className="w-full border-t border-t-foreground/10 p-8 flex justify-center text-center text-xs">
-        <p>
-          Powered by{" "}
-          <a
-            href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-            target="_blank"
-            className="font-bold hover:underline"
-            rel="noreferrer"
-          >
-            Supabase
-          </a>
-        </p>
-      </footer>
     </div>
   );
 }
